@@ -20,7 +20,6 @@ module Haml
         )
       end
 
-      alias_method :build_attributes_without_dasherize, :build_attributes
       alias_method :build_attributes, :build_attributes_with_dasherize
     end
   end
