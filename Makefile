@@ -29,7 +29,7 @@ WWW_BASE = /opt
 INIT_STYLE = suse
 
 # Set this to true to bundle gems inside rpm
-BUNDLE_GEMS = false
+BUNDLE_GEMS = true
 
 # This should be discoverable in a better way
 RUBY_ABI = 2.1.0
@@ -54,9 +54,9 @@ all: scripts/hawk.$(INIT_STYLE) scripts/hawk.service scripts/hawk.service.bundle
 		# Generate Gemfile.lock \
 		bundle list && \
 		# Strip unwanted gems from Gemfile.lock \
-		sed -i -e '/\brdoc\b/d' -e '/\brake\b/d' -e '/\bjson\b/d' Gemfile.lock && \
+		sed -i -e '/\brdoc\b/d' Gemfile.lock && \
 		# Finally package and install the gems \
-		bundle package && bundle install --local --deployment ; \
+		bundle package && bundle install --deployment ; \
 	 fi ; \
 	 TEXTDOMAIN=hawk bin/rake gettext:pack; \
 	 RAILS_ENV=production bin/rake assets:precompile)
@@ -137,6 +137,15 @@ clean:
 	rm -f tools/hawk_monitor
 	rm -f tools/hawk_invoke
 	rm -f tools/common.h
+	rm -rf hawk/public/assets/
+	rm -rf hawk/vendor/bundle/
+	rm -rf hawk/vendor/cache/
+	rm -f scripts/hawk.service
+	rm -f scripts/hawk.service.bundle_gems
+	rm -f hawk/Gemfile.lock
+	rm -rf hawk/.bundle
+	# Hack so we don't regen po files
+	git diff hawk/locale/ | patch -p1 -R
 
 # Note: chown & chmod here are only necessary if *not* doing an RPM build
 # (the spec sets file ownership/perms for RPMs).
