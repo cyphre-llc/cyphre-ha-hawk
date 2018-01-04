@@ -28,11 +28,8 @@ WWW_BASE = /opt
 # Override this to get a different init script (e.g. "redhat")
 INIT_STYLE = suse
 
-# Set this to true to bundle gems inside rpm
-BUNDLE_GEMS = true
-
 # This should be discoverable in a better way
-RUBY_ABI = 2.1.0
+RUBY_ABI = 2.3.0
 
 # Set this never to 1, it's used only within vagrant for development
 WITHIN_VAGRANT = 0
@@ -48,16 +45,7 @@ SBINDIR = /usr/sbin
 
 all: scripts/hawk.$(INIT_STYLE) scripts/hawk.service scripts/hawk.service.bundle_gems tools
 	(cd hawk; \
-	 if $(BUNDLE_GEMS) ; then \
-		# Ignore gems from test \
-		export BUNDLE_WITHOUT="test" && \
-		# Generate Gemfile.lock \
-		bundle list && \
-		# Strip unwanted gems from Gemfile.lock \
-		sed -i -e '/\brdoc\b/d' Gemfile.lock && \
-		# Finally package and install the gems \
-		bundle package && bundle install --deployment ; \
-	 fi ; \
+	 BUNDLE_WITHOUT="test" bundle install --deployment; \
 	 TEXTDOMAIN=hawk bin/rake gettext:pack; \
 	 RAILS_ENV=production bin/rake assets:precompile)
 
@@ -106,15 +94,12 @@ base/install:
 	-find hawk/vendor -name '*bak' -o -name '*~' -o -name '#*#' -delete
 	cp -a hawk/* $(DESTDIR)$(WWW_BASE)/hawk
 	-cp -a hawk/.bundle $(DESTDIR)$(WWW_BASE)/hawk
+	-chown -R root.root $(DESTDIR)$(WWW_BASE)/hawk
 	-chown -R hacluster.haclient $(DESTDIR)$(WWW_BASE)/hawk/log || true
 	-chown -R hacluster.haclient $(DESTDIR)$(WWW_BASE)/hawk/tmp || true
 	-chmod g+w $(DESTDIR)$(WWW_BASE)/hawk/tmp/home
 	-chmod g+w $(DESTDIR)$(WWW_BASE)/hawk/tmp/explorer
-ifeq ($(BUNDLE_GEMS),true)
-		install -D -m 0644 scripts/hawk.service.bundle_gems $(DESTDIR)/usr/lib/systemd/system/hawk.service
-else
-		install -D -m 0644 scripts/hawk.service $(DESTDIR)/usr/lib/systemd/system/hawk.service
-endif
+	install -D -m 0644 scripts/hawk.service.bundle_gems $(DESTDIR)/usr/lib/systemd/system/hawk.service
 
 tools/install:
 	install -D -m 4750 tools/hawk_chkpwd $(DESTDIR)/usr/sbin/hawk_chkpwd
@@ -142,7 +127,6 @@ clean:
 	rm -rf hawk/vendor/cache/
 	rm -f scripts/hawk.service
 	rm -f scripts/hawk.service.bundle_gems
-	rm -f hawk/Gemfile.lock
 	rm -rf hawk/.bundle
 	# Hack so we don't regen po files
 	git diff hawk/locale/ | patch -p1 -R
