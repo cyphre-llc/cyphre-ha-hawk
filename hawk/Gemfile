@@ -1,19 +1,6 @@
 # Copyright (c) 2009-2015 Tim Serong <tserong@suse.com>
 # See COPYING for license.
 
-#
-# Note: When using Bundler (i.e. on SLES), the Gemfile is used.
-# Anywhere else, we don't package the Gemfile, so need to require
-# rails, fast_gettext, etc. in config/boot.rb, i.e. if we add more
-# gems here, they need to go in config/boot.rb as well. Yes, this
-# sucks, but it's the least-worst solution I can find right now for
-# making Bundler go away when we neither need nor want it.
-#
-# Have I mentioned lately that while Bundler may be "the best way to
-# manage a Ruby application's gems", it's an absolute menace if you're
-# trying to build packaged software?
-#
-
 source 'https://rubygems.org'
 
 gem "rails", "~> 4.2.0"
