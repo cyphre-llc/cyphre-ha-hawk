@@ -14,7 +14,7 @@ else
   set_config(ENV["HAWK_ENV"] || "production",
              ENV["HAWK_THREADS"] || 16,
              ENV["HAWK_WORKERS"] || 1,
-             ENV["HAWK_LISTEN"] || "0.0.0.0",
+             ENV["HAWK_LISTEN"] || "127.0.0.1",
              ENV["HAWK_PORT"] || "7630",
              ENV["HAWK_KEY"] || "/etc/hawk/hawk.key",
              ENV["HAWK_CERT"] || "/etc/hawk/hawk.pem")
