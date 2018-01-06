@@ -10,18 +10,18 @@ $simulator-right: #80c235;
 
 
 // ----  content.scss variables - login page ----
-$darkbar-bg: #2b2b2b;
+$darkbar-bg: #333;
 $darkbar-heading-fg:#00b268;
 $rightbar-bg: #ebebeb;
-$sidebar-headings-fg: rgb(58, 62, 64);
+$sidebar-headings-fg: #000;
 $sidebar-headings-font-family: $headings-font-family;
 $sidebar-highlight-fg: #80c235;
-$sidebar-link-hover-fg: darken(#fff, 20.0%);
-$sidebar-separator-fg: #333;
 $sidebar-link-fg: #fff;
+$sidebar-link-hover-fg: darken($sidebar-link-fg, 20.0%);
+$sidebar-separator-fg: #333;
 $sidebar-heading-fg: #00b268;
-$sidebar-fg: #fff;
-$sidebar-bg: #383c3e;
+$sidebar-fg: #000;
+$sidebar-bg: #fff;
 
 
 //  ----  head.scss variables ----
