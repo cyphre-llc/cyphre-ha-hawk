@@ -15,6 +15,7 @@ WorkingDirectory=@WWW_BASE@/hawk
 
 Environment="GEM_PATH=@GEM_PATH@"
 Environment="HAWK_ENV=production"
+Environment="RAILS_RELATIVE_URL_ROOT=/hawk"
 EnvironmentFile=-/etc/sysconfig/hawk
 
 # Run ExecStartPre with root-permissions

@@ -44,7 +44,7 @@ SBINDIR = /usr/sbin
 .PHONY: all clean tools
 
 all: scripts/hawk.$(INIT_STYLE) scripts/hawk.service scripts/hawk.service.bundle_gems tools
-	(cd hawk; \
+	(cd hawk; export RAILS_RELATIVE_URL_ROOT=/hawk; \
 	 BUNDLE_WITHOUT="test" bundle install --deployment; \
 	 TEXTDOMAIN=hawk bin/rake gettext:pack; \
 	 RAILS_ENV=production bin/rake assets:precompile)
