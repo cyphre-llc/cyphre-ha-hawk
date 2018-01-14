@@ -101,8 +101,12 @@ base/install:
 	-chmod g+w $(DESTDIR)$(WWW_BASE)/hawk/tmp/explorer
 
 tools/install:
-	install -D -m 4750 -o root -g haclient tools/hawk_chkpwd $(DESTDIR)/usr/sbin/hawk_chkpwd
-	install -D -m 4750 -o root -g haclient tools/hawk_invoke $(DESTDIR)/usr/sbin/hawk_invoke
+	install -D tools/hawk_chkpwd $(DESTDIR)/usr/sbin/hawk_chkpwd
+	-chown root:haclient $(DESTDIR)/usr/sbin/hawk_chkpwd
+	-chmod 4750 $(DESTDIR)/usr/sbin/hawk_chkpwd
+	install -D tools/hawk_invoke $(DESTDIR)/usr/sbin/hawk_invoke
+	-chown root:haclient $(DESTDIR)/usr/sbin/hawk_invoke
+	-chmod 4750 $(DESTDIR)/usr/sbin/hawk_invoke
 	install -D -m 0755 tools/hawk_monitor $(DESTDIR)/usr/sbin/hawk_monitor
 
 # TODO(should): Verify this is really clean (it won't get rid of .mo files,
