@@ -12,6 +12,15 @@
     float: left;
   }
 
+  .navbar-brand {
+    padding: 10px 15px;
+
+    img {
+      height: 40px;
+      width: 115px;
+    }
+  }
+
   .navbar-nav {
     float: left;
     margin: 0;
