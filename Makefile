@@ -43,7 +43,7 @@ SBINDIR = /usr/sbin
 
 .PHONY: all clean tools
 
-all: scripts/hawk.$(INIT_STYLE) scripts/hawk.service scripts/hawk.service.bundle_gems tools
+all: tools
 	(cd hawk; export RAILS_RELATIVE_URL_ROOT=/hawk; \
 	 BUNDLE_WITHOUT="test" bundle install --deployment; \
 	 TEXTDOMAIN=hawk bin/rake gettext:pack; \
@@ -99,7 +99,6 @@ base/install:
 	-chown -R hacluster.haclient $(DESTDIR)$(WWW_BASE)/hawk/tmp || true
 	-chmod g+w $(DESTDIR)$(WWW_BASE)/hawk/tmp/home
 	-chmod g+w $(DESTDIR)$(WWW_BASE)/hawk/tmp/explorer
-	install -D -m 0644 scripts/hawk.service.bundle_gems $(DESTDIR)/usr/lib/systemd/system/hawk.service
 
 tools/install:
 	install -D -m 4750 -o root -g haclient tools/hawk_chkpwd $(DESTDIR)/usr/sbin/hawk_chkpwd
