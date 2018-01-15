@@ -7,7 +7,7 @@ Rails.application.configure do
   config.consider_all_requests_local = false
   config.serve_static_files = true
   config.force_ssl = false
-  config.autoflush_log = false
+  config.autoflush_log = true
 
   config.action_dispatch.show_exceptions = false
   config.action_dispatch.cookies_serializer = :json
@@ -39,7 +39,5 @@ Rails.application.configure do
 
   config.i18n.fallbacks = true
 
-  config.log_level = :warn
-
-  config.logger = Logger.new(STDOUT)
+  config.log_level = :debug
 end
