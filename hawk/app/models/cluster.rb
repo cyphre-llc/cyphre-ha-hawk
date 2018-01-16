@@ -30,7 +30,8 @@ class Cluster < Tableless
       "host" => @host,
       "https" => @https,
       "port" => @port,
-      "interval" => @interval
+      "interval" => @interval,
+      "base_url" => ENV['RAILS_RELATIVE_URL_ROOT']
     }
   end
 

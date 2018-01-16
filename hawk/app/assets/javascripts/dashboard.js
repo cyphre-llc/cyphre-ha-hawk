@@ -299,11 +299,11 @@
 
   function baseUrl(clusterInfo) {
     if (clusterInfo.host == null) {
-      return "";
+      return clusterInfo.base_url;
     } else {
       var transport = clusterInfo.https ? "https" : "http";
       var port = clusterInfo.port || "7630";
-      return transport + "://" + clusterInfo.host + ":" + port;
+      return transport + "://" + clusterInfo.host + ":" + port + clusterInfo.base_url;
     }
   }
 

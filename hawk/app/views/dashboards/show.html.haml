@@ -13,7 +13,7 @@
   -# passing null as name and host means to fetch local cluster information
   - unless current_cib.offline?
     :javascript
-      dashboardAddCluster({"name":null, "host":null, "port":null, https:null, "interval":10});
+      dashboardAddCluster({"name":null, "host":null, "port":null, https:null, "interval":10, "base_url": "#{ENV['RAILS_RELATIVE_URL_ROOT']}"});
 
   :javascript
     #{javascript_for_clusters @clusters}
