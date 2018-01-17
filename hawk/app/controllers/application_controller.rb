@@ -176,7 +176,7 @@ class ApplicationController < ActionController::Base
   end
 
   def is_god?
-    current_user == "hacluster" || current_user == is_root?
+    current_user == "hacluster" || current_user == 'root' || current_user == is_root?
   end
 
   def is_root?
