@@ -79,13 +79,11 @@ tools: tools/hawk_chkpwd tools/hawk_monitor tools/hawk_invoke
 
 base/install:
 	mkdir -p $(DESTDIR)$(WWW_BASE)/hawk/log
-	mkdir -p $(DESTDIR)$(WWW_BASE)/hawk/tmp
 	mkdir -p $(DESTDIR)$(WWW_BASE)/hawk/locale
-	mkdir -p $(DESTDIR)$(WWW_BASE)/hawk/tmp
 	mkdir -p $(DESTDIR)$(WWW_BASE)/hawk/tmp/cache
-	mkdir -p $(DESTDIR)$(WWW_BASE)/hawk/tmp/explorer
 	mkdir -p $(DESTDIR)$(WWW_BASE)/hawk/tmp/explorer/uploads
 	mkdir -p $(DESTDIR)$(WWW_BASE)/hawk/tmp/pids
+	mkdir -p $(DESTDIR)$(WWW_BASE)/hawk/tmp/report-pids
 	mkdir -p $(DESTDIR)$(WWW_BASE)/hawk/tmp/sessions
 	mkdir -p $(DESTDIR)$(WWW_BASE)/hawk/tmp/sockets
 	mkdir -p $(DESTDIR)$(WWW_BASE)/hawk/tmp/home

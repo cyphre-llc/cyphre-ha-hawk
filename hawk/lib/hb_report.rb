@@ -14,7 +14,7 @@ class HbReport
   attr_reader :lastexit
 
   def initialize(name = nil)
-    tmpbase = Rails.root.join('tmp', 'pids')
+    tmpbase = Rails.root.join('tmp', 'report-pids')
     reports = Rails.root.join('tmp', 'reports')
     tmpbase.mkpath unless tmpbase.directory?
     reports.mkpath unless reports.directory?
