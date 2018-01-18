@@ -183,7 +183,7 @@ class ApplicationController < ActionController::Base
     return true if current_user == 'root'
     sudo_group = Etc.getgrnam('sudo')
     return false unless sudo_group
-    retrun true if sudo_group.mem.include?(current_user)
+    return true if sudo_group.mem.include?(current_user)
   end
 
   def logged_in?
