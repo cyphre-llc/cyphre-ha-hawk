@@ -25,6 +25,9 @@ RPM_OPTS = --define "_sourcedir $(RPM_ROOT)"	\
 #   make WWW_BASE=/var/www install
 WWW_BASE = /opt
 
+# Where to store bundled gems
+BUNDLE_PATH = vendor/bundle
+
 # Override this to get a different init script (e.g. "redhat")
 INIT_STYLE = suse
 
@@ -44,10 +47,6 @@ SBINDIR = /usr/sbin
 .PHONY: all clean tools
 
 all: tools
-	(cd hawk; export RAILS_RELATIVE_URL_ROOT=/hawk; \
-	 BUNDLE_WITHOUT="test" bundle install --deployment; \
-	 TEXTDOMAIN=hawk bin/rake gettext:pack; \
-	 RAILS_ENV=production bin/rake assets:precompile)
 
 %:: %.in
 	sed \
@@ -56,7 +55,7 @@ all: tools
 		-e 's|@BINDIR@|$(BINDIR)|g' \
 		-e 's|@SBINDIR@|$(SBINDIR)|g' \
 		-e 's|@WITHIN_VAGRANT@|$(WITHIN_VAGRANT)|g' \
-		-e 's|@GEM_PATH@|$(WWW_BASE)/hawk/vendor/bundle/ruby/$(RUBY_ABI)|g' \
+		-e 's|@GEM_PATH@|$(WWW_BASE)/hawk/$(BUNDLE_PATH)/ruby/$(RUBY_ABI)|g' \
 		$< > $@
 
 tools/hawk_chkpwd: tools/hawk_chkpwd.c tools/common.h
@@ -91,7 +90,6 @@ base/install:
 	mkdir -p $(DESTDIR)$(WWW_BASE)/hawk/tmp/sockets
 	mkdir -p $(DESTDIR)$(WWW_BASE)/hawk/tmp/home
 	# Get rid of cruft from packed gems
-	-find hawk/vendor -name '*bak' -o -name '*~' -o -name '#*#' -delete
 	cp -a hawk/* $(DESTDIR)$(WWW_BASE)/hawk
 	-cp -a hawk/.bundle $(DESTDIR)$(WWW_BASE)/hawk
 	-chown -R root.root $(DESTDIR)$(WWW_BASE)/hawk
@@ -99,6 +97,11 @@ base/install:
 	-chown -R hacluster.haclient $(DESTDIR)$(WWW_BASE)/hawk/tmp || true
 	-chmod g+w $(DESTDIR)$(WWW_BASE)/hawk/tmp/home
 	-chmod g+w $(DESTDIR)$(WWW_BASE)/hawk/tmp/explorer
+	(cd $(DESTDIR)$(WWW_BASE)/hawk; export RAILS_RELATIVE_URL_ROOT=/hawk; \
+	 BUNDLE_WITHOUT="test" bundle install --deployment --path=$(BUNDLE_PATH); \
+	 TEXTDOMAIN=hawk bin/rake gettext:pack; \
+	 RAILS_ENV=production bin/rake assets:precompile)
+	chown -R root.root $(DESTDIR)$(WWW_BASE)/hawk
 
 tools/install:
 	install -D tools/hawk_chkpwd $(DESTDIR)/usr/sbin/hawk_chkpwd
@@ -120,7 +123,7 @@ clean:
 	rm -f tools/hawk_invoke
 	rm -f tools/common.h
 	rm -rf hawk/public/assets/
-	rm -rf hawk/vendor/bundle/
+	rm -rf hawk/$(BUNDLE_PATH)/
 	rm -rf hawk/vendor/cache/
 	rm -f scripts/hawk.service
 	rm -f scripts/hawk.service.bundle_gems
