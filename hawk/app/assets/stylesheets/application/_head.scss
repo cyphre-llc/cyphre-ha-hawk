@@ -3,6 +3,7 @@
 
 .navbar-fixed-top {
   margin-bottom: 0;
+  background-color: rgb(66, 152, 204);
 
   &.navbar-inverse {
     border: 0;
@@ -31,6 +32,11 @@
       a {
         padding-top: 20px;
         padding-bottom: 20px;
+        color: #fff;
+        &:hover {
+          color: #9d9d9d;
+          background-color: transparent;
+        }
       }
     }
   }
