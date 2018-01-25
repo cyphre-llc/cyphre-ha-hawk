@@ -32,6 +32,11 @@
       a {
         padding-top: 20px;
         padding-bottom: 20px;
+        color: #fff;
+        &:hover {
+          color: #9d9d9d;
+          background-color: transparent;
+        }
       }
     }
   }
