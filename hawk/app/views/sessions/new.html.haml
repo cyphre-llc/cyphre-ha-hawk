@@ -3,4 +3,5 @@
   = main_form.password_field :password, placeholder: _("Password"), label: { class: 'sr-only' }
 
   = main_form.submit _("Login"), class: "btn btn-primary btn-block"
-  = link_to _("Cyphre Central"), "/", class: "btn btn-ccui btn-block"
+  %div{ style: 'text-align: center; margin: 10px;' }
+    = link_to _("Cyphre Central"), "/", class: "ccui-link"
