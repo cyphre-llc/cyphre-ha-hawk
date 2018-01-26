@@ -1,0 +1,11 @@
+.ccui-link {
+  background: transparent;
+  color: #fff;
+  border-color: transparent;
+
+  &:hover {
+    color: #9d9d9d;
+    border-color: transparent;
+    text-decoration: none;
+  }
+}
