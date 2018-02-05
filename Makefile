@@ -89,7 +89,6 @@ base/install:
 	mkdir -p $(DESTDIR)$(WWW_BASE)/hawk/tmp/home
 	# Get rid of cruft from packed gems
 	cp -a hawk/* $(DESTDIR)$(WWW_BASE)/hawk
-	-cp -a hawk/.bundle $(DESTDIR)$(WWW_BASE)/hawk
 	-chown -R root.root $(DESTDIR)$(WWW_BASE)/hawk
 	-chown -R hacluster.haclient $(DESTDIR)$(WWW_BASE)/hawk/log || true
 	-chown -R hacluster.haclient $(DESTDIR)$(WWW_BASE)/hawk/tmp || true
