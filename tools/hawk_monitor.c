@@ -84,7 +84,7 @@ enum cib_errors {
 	cib_connection	= -ENOTCONN,
 };
 
-#define CONNECT_TIMEOUT		60
+#define CONNECT_TIMEOUT		5
 #define MAX_EPOCH_LENGTH	128	/* way longer than necessary */
 
 #ifndef T_CIB_DIFF_NOTIFY
@@ -246,4 +246,3 @@ int main(int argc, char **argv)
 	finish();
 	return 0; /* never reached */
 }
-
