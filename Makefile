@@ -1,6 +1,8 @@
 # Copyright (c) 2009-2015 Tim Serong <tserong@suse.com>
 # See COPYING for license.
 
+CPUS=$(shell getconf _NPROCESSORS_ONLN)
+
 GIT = $(shell which git 2>/dev/null)
 
 # This gives current changeset hash (7 digits).  This is the reliable
@@ -95,7 +97,7 @@ base/install:
 	-chmod g+w $(DESTDIR)$(WWW_BASE)/hawk/tmp/home
 	-chmod g+w $(DESTDIR)$(WWW_BASE)/hawk/tmp/explorer
 	(cd $(DESTDIR)$(WWW_BASE)/hawk; export RAILS_RELATIVE_URL_ROOT=/hawk; \
-	 BUNDLE_WITHOUT="test" bundle install --deployment --path=$(BUNDLE_PATH); \
+	 BUNDLE_WITHOUT="test" bundle install --jobs=$(CPUS) --deployment --path=$(BUNDLE_PATH); \
 	 TEXTDOMAIN=hawk bin/rake gettext:pack; \
 	 RAILS_ENV=production bin/rake assets:precompile)
 	chown -R root.root $(DESTDIR)$(WWW_BASE)/hawk
