@@ -2,10 +2,10 @@
 # See COPYING for license.
 
 class OrdersController < ApplicationController
-  before_filter :login_required
-  before_filter :set_title
-  before_filter :set_cib
-  before_filter :set_record, only: [:edit, :update, :destroy, :show]
+  before_action :login_required
+  before_action :set_title
+  before_action :set_cib
+  before_action :set_record, only: [:edit, :update, :destroy, :show]
 
   def index
     respond_to do |format|
@@ -26,10 +26,10 @@ class OrdersController < ApplicationController
   end
 
   def create
-    normalize_params! params[:order]
+    normalize_params! params.to_unsafe_h[:order]
     @title = _("Create Order")
 
-    @order = Order.new params[:order]
+    @order = Order.new params.to_unsafe_h[:order]
 
     respond_to do |format|
       if @order.save
@@ -62,15 +62,15 @@ class OrdersController < ApplicationController
   end
 
   def update
-    normalize_params! params[:order]
+    normalize_params! params.to_unsafe_h[:order]
     @title = _("Edit Order")
 
-    if params[:revert]
+    if params.to_unsafe_h[:revert]
       return redirect_to edit_cib_order_url(cib_id: @cib.id, id: @order.id)
     end
 
     respond_to do |format|
-      if @order.update_attributes(params[:order])
+      if @order.update_attributes(params.to_unsafe_h[:order])
         post_process_for! @order
 
         format.html do
@@ -138,7 +138,7 @@ class OrdersController < ApplicationController
   end
 
   def set_record
-    @order = Order.find params[:id]
+    @order = Order.find params.to_unsafe_h[:id]
 
     unless @order
       respond_to do |format|
@@ -154,10 +154,10 @@ class OrdersController < ApplicationController
   end
 
   def normalize_params!(current)
-    if params[:order][:resources].nil?
-      params[:order][:resources] = []
+    if params.to_unsafe_h[:order][:resources].nil?
+      params.to_unsafe_h[:order][:resources] = []
     else
-      params[:order][:resources] = params[:order][:resources].values
+      params.to_unsafe_h[:order][:resources] = params.to_unsafe_h[:order][:resources].values
     end
   end
 

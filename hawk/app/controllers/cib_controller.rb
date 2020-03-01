@@ -2,9 +2,9 @@
 # See COPYING for license.
 
 class CibController < ApplicationController
-  before_filter :login_required
-  before_filter :set_title
-  before_filter :set_cib
+  before_action :login_required
+  before_action :set_title
+  before_action :set_cib
 
   skip_before_action :verify_authenticity_token, only: [:show, :apply]
 
@@ -12,7 +12,7 @@ class CibController < ApplicationController
     respond_to do |format|
       format.html
       format.json do
-        render json: current_cib.status(params[:mini] == "true")
+        render json: current_cib.status(params.to_unsafe_h[:mini] == "true")
       end
     end
   rescue ArgumentError => e
@@ -64,7 +64,7 @@ class CibController < ApplicationController
   end
 
   def ops
-    invars = params[:id].split(",", 2)
+    invars = params.to_unsafe_h[:id].split(",", 2)
     if invars.length == 1
       rsc = invars[0]
       node = "*"
@@ -126,7 +126,7 @@ class CibController < ApplicationController
   end
 
   def detect_modal_layout
-    if request.xhr? && (params[:action] == :meta || params[:action] == :apply)
+    if request.xhr? && (params.to_unsafe_h[:action] == :meta || params.to_unsafe_h[:action] == :apply)
       "modal"
     else
       detect_current_layout

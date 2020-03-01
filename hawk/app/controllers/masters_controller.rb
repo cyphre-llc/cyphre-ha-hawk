@@ -2,10 +2,10 @@
 # See COPYING for license.
 
 class MastersController < ApplicationController
-  before_filter :login_required
-  before_filter :set_title
-  before_filter :set_cib
-  before_filter :set_record, only: [:edit, :update, :destroy, :show]
+  before_action :login_required
+  before_action :set_title
+  before_action :set_cib
+  before_action :set_record, only: [:edit, :update, :destroy, :show]
 
   def index
     respond_to do |format|
@@ -27,10 +27,10 @@ class MastersController < ApplicationController
   end
 
   def create
-    normalize_params! params[:master]
+    normalize_params! params.to_unsafe_h[:master]
     @title = _("Create Multi-state resource")
 
-    @master = Master.new params[:master]
+    @master = Master.new params.to_unsafe_h[:master]
 
     respond_to do |format|
       if @master.save
@@ -63,15 +63,15 @@ class MastersController < ApplicationController
   end
 
   def update
-    normalize_params! params[:master]
+    normalize_params! params.to_unsafe_h[:master]
     @title = _("Edit Multi-state resource")
 
-    if params[:revert]
+    if params.to_unsafe_h[:revert]
       return redirect_to edit_cib_master_url(cib_id: @cib.id, id: @master.id)
     end
 
     respond_to do |format|
-      if @master.update_attributes(params[:master])
+      if @master.update_attributes(params.to_unsafe_h[:master])
         post_process_for! @master
 
         format.html do
@@ -139,7 +139,7 @@ class MastersController < ApplicationController
   end
 
   def set_record
-    @master = Master.find params[:id]
+    @master = Master.find params.to_unsafe_h[:id]
 
     unless @master
       respond_to do |format|

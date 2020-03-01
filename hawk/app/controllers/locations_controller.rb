@@ -2,10 +2,10 @@
 # See COPYING for license.
 
 class LocationsController < ApplicationController
-  before_filter :login_required
-  before_filter :set_title
-  before_filter :set_cib
-  before_filter :set_record, only: [:edit, :update, :destroy, :show]
+  before_action :login_required
+  before_action :set_title
+  before_action :set_cib
+  before_action :set_record, only: [:edit, :update, :destroy, :show]
 
   def index
     respond_to do |format|
@@ -35,10 +35,10 @@ class LocationsController < ApplicationController
   end
 
   def create
-    normalize_params! params[:location]
+    normalize_params! params.to_unsafe_h[:location]
     @title = _('Create Location Constraint')
 
-    @location = Location.new params[:location]
+    @location = Location.new params.to_unsafe_h[:location]
 
     if @location.rules.empty?
       @location.rules.push(
@@ -80,15 +80,15 @@ class LocationsController < ApplicationController
   end
 
   def update
-    normalize_params! params[:location]
+    normalize_params! params.to_unsafe_h[:location]
     @title = _('Edit Location Constraint')
 
-    if params[:revert]
+    if params.to_unsafe_h[:revert]
       return redirect_to edit_cib_location_url(cib_id: @cib.id, id: @location.id)
     end
 
     respond_to do |format|
-      if @location.update_attributes(params[:location])
+      if @location.update_attributes(params.to_unsafe_h[:location])
         post_process_for! @location
 
         format.html do
@@ -156,7 +156,7 @@ class LocationsController < ApplicationController
   end
 
   def set_record
-    @location = Location.find params[:id]
+    @location = Location.find params.to_unsafe_h[:id]
 
     unless @location
       respond_to do |format|

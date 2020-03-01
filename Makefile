@@ -97,7 +97,7 @@ base/install:
 	-chmod g+w $(DESTDIR)$(WWW_BASE)/hawk/tmp/home
 	-chmod g+w $(DESTDIR)$(WWW_BASE)/hawk/tmp/explorer
 	(cd $(DESTDIR)$(WWW_BASE)/hawk; export RAILS_RELATIVE_URL_ROOT=/hawk; \
-	 BUNDLE_WITHOUT="test" bundle install --jobs=$(CPUS) --deployment --path=$(BUNDLE_PATH); \
+	 BUNDLE_WITHOUT="test development" bundle install --jobs=$(CPUS) --deployment --path=$(BUNDLE_PATH); \
 	 TEXTDOMAIN=hawk bin/rake gettext:pack; \
 	 RAILS_ENV=production bin/rake assets:precompile)
 	chown -R root.root $(DESTDIR)$(WWW_BASE)/hawk

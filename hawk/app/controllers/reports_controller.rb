@@ -2,11 +2,11 @@
 # See COPYING for license.
 
 class ReportsController < ApplicationController
-  before_filter :login_required
-  before_filter :god_required
-  before_filter :set_title
-  before_filter :set_record, only: [:show, :destroy, :download, :cache]
-  before_filter :set_transition, only: [:display, :detail, :graph, :logs, :diff, :pefile, :status, :cib]
+  before_action :login_required
+  before_action :god_required
+  before_action :set_title
+  before_action :set_record, only: [:show, :destroy, :download, :cache]
+  before_action :set_transition, only: [:display, :detail, :graph, :logs, :diff, :pefile, :status, :cib]
 
   helper_method :current_transition
   helper_method :prev_transition
@@ -34,8 +34,8 @@ class ReportsController < ApplicationController
 
   def generate
     errors = []
-    from_time = parse_time params[:report][:from_time], errors
-    to_time = parse_time params[:report][:to_time], errors
+    from_time = parse_time params.to_unsafe_h[:report][:from_time], errors
+    to_time = parse_time params.to_unsafe_h[:report][:to_time], errors
 
     unless errors.empty?
       render json: { error: errors.full_messages.to_sentence }
@@ -65,7 +65,7 @@ class ReportsController < ApplicationController
   end
 
   def upload
-    @report = Report::Upload.new params[:report]
+    @report = Report::Upload.new params.to_unsafe_h[:report]
 
     respond_to do |format|
       if @report.save
@@ -267,7 +267,7 @@ class ReportsController < ApplicationController
   end
 
   def set_record
-    @report = Report.find params[:id]
+    @report = Report.find params.to_unsafe_h[:id]
 
     fail Cib::RecordNotFound.new(_("The report does not exist"), redirect_to: reports_path) if @report.nil?
   end
@@ -276,7 +276,7 @@ class ReportsController < ApplicationController
     session[:history_session_poke] = "poke"
     set_record
     @hb_report = HbReport.new @report.name
-    @transitions = Rails.cache.fetch("#{params[:id]}/#{session.id}", expires_in: 2.hours) do
+    @transitions = Rails.cache.fetch("#{params.to_unsafe_h[:id]}/#{session.id}", expires_in: 2.hours) do
       @report.transitions(@hb_report).select do |t|
         # TODO(must): handle this better
         !t.key?(:error)
@@ -287,7 +287,7 @@ class ReportsController < ApplicationController
   def set_transition
     set_transitions
     if params.has_key? :transition
-      tidx = params[:transition].to_i
+      tidx = params.to_unsafe_h[:transition].to_i
       tidx -= 1 if tidx > 0
       tidx = -1 if tidx >= @transitions.length
       curr_transition = @transitions[tidx]
@@ -303,10 +303,10 @@ class ReportsController < ApplicationController
   end
 
   def current_transition
-    if params[:transition].nil?
+    if params.to_unsafe_h[:transition].nil?
       0
     else
-      params[:transition].to_i
+      params.to_unsafe_h[:transition].to_i
     end
   end
 

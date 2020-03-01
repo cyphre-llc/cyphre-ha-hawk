@@ -2,10 +2,10 @@
 # See COPYING for license.
 
 class AlertsController < ApplicationController
-  before_filter :login_required
-  before_filter :set_title
-  before_filter :set_cib
-  before_filter :set_record, only: [:edit, :update, :destroy, :show]
+  before_action :login_required
+  before_action :set_title
+  before_action :set_cib
+  before_action :set_record, only: [:edit, :update, :destroy, :show]
 
   def index
     respond_to do |format|
@@ -26,10 +26,10 @@ class AlertsController < ApplicationController
   end
 
   def create
-    normalize_params! params[:alert]
+    normalize_params! params.to_unsafe_h[:alert]
     @title = _("Create Alert")
 
-    alertdata = params[:alert]
+    alertdata = params.to_unsafe_h[:alert]
     alertdata["recipients"] = alertdata["recipients"].values
     @alert = Alert.new alertdata
 
@@ -64,15 +64,15 @@ class AlertsController < ApplicationController
   end
 
   def update
-    normalize_params! params[:alert]
+    normalize_params! params.to_unsafe_h[:alert]
     @title = _("Edit Alert")
 
-    if params[:revert]
+    if params.to_unsafe_h[:revert]
       return redirect_to edit_cib_alert_url(cib_id: @cib.id, id: @alert.id)
     end
 
     respond_to do |format|
-      alertdata = params[:alert]
+      alertdata = params.to_unsafe_h[:alert]
       alertdata["recipients"] = alertdata["recipients"].values
       if @alert.update_attributes(alertdata)
         post_process_for! @alert
@@ -142,7 +142,7 @@ class AlertsController < ApplicationController
   end
 
   def set_record
-    @alert = Alert.find params[:id]
+    @alert = Alert.find params.to_unsafe_h[:id]
 
     unless @alert
       respond_to do |format|

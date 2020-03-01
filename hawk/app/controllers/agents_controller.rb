@@ -3,12 +3,12 @@
 # See COPYING for license.
 
 class AgentsController < ApplicationController
-  before_filter :login_required
-  before_filter :set_title
+  before_action :login_required
+  before_action :set_title
 
   def show
-    if params[:id].start_with? "@"
-      name = params[:id][1..-1]
+    if params.to_unsafe_h[:id].start_with? "@"
+      name = params.to_unsafe_h[:id][1..-1]
       template = Hash.from_xml(Util.safe_x("/usr/sbin/cibadmin", "-l", "--query", "--xpath", "//template[@id='#{name}']"))
       Rails.logger.debug "Template: #{template}"
       if template
@@ -20,7 +20,7 @@ class AgentsController < ApplicationController
         @name = name + template["type"]
       end
     else
-      @name = params[:id]
+      @name = params.to_unsafe_h[:id]
     end
     @agent = Hash.from_xml(Util.safe_x("/usr/sbin/crm_resource", "--show-metadata", @name))
 

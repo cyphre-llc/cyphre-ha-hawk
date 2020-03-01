@@ -5,7 +5,7 @@ require 'securerandom'
 
 class SessionsController < ApplicationController
 
-  skip_before_filter :verify_authenticity_token
+  skip_before_action :verify_authenticity_token
 
   def new
     @session = Session.new
@@ -21,7 +21,7 @@ class SessionsController < ApplicationController
   end
 
   def create
-    @session = Session.new params[:session]
+    @session = Session.new params.to_unsafe_h[:session]
 
     respond_to do |format|
       if @session.valid?
@@ -53,7 +53,7 @@ class SessionsController < ApplicationController
   end
 
   def destroy
-    if params[:reason] == 'forbidden'
+    if params.to_unsafe_h[:reason] == 'forbidden'
       message = if session[:username]
         _('Permission denied for user %{user}') % { user: session[:username] }
       else

@@ -2,10 +2,10 @@
 # See COPYING for license.
 
 class GroupsController < ApplicationController
-  before_filter :login_required
-  before_filter :set_title
-  before_filter :set_cib
-  before_filter :set_record, only: [:edit, :update, :destroy, :show]
+  before_action :login_required
+  before_action :set_title
+  before_action :set_cib
+  before_action :set_record, only: [:edit, :update, :destroy, :show]
 
   def index
     respond_to do |format|
@@ -27,10 +27,10 @@ class GroupsController < ApplicationController
   end
 
   def create
-    normalize_params! params[:group]
+    normalize_params! params.to_unsafe_h[:group]
     @title = _("Create Group")
 
-    @group = Group.new params[:group]
+    @group = Group.new params.to_unsafe_h[:group]
 
     respond_to do |format|
       if @group.save
@@ -63,15 +63,15 @@ class GroupsController < ApplicationController
   end
 
   def update
-    normalize_params! params[:group]
+    normalize_params! params.to_unsafe_h[:group]
     @title = _("Edit Group")
 
-    if params[:revert]
+    if params.to_unsafe_h[:revert]
       return redirect_to edit_cib_group_url(cib_id: @cib.id, id: @group.id)
     end
 
     respond_to do |format|
-      if @group.update_attributes(params[:group])
+      if @group.update_attributes(params.to_unsafe_h[:group])
         post_process_for! @group
 
         format.html do
@@ -139,7 +139,7 @@ class GroupsController < ApplicationController
   end
 
   def set_record
-    @group = Group.find params[:id]
+    @group = Group.find params.to_unsafe_h[:id]
 
     unless @group
       respond_to do |format|

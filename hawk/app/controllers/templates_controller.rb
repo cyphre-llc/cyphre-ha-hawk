@@ -2,11 +2,11 @@
 # See COPYING for license.
 
 class TemplatesController < ApplicationController
-  before_filter :login_required
-  before_filter :feature_support
-  before_filter :set_title
-  before_filter :set_cib
-  before_filter :set_record, only: [:edit, :update, :destroy, :show]
+  before_action :login_required
+  before_action :feature_support
+  before_action :set_title
+  before_action :set_cib
+  before_action :set_record, only: [:edit, :update, :destroy, :show]
 
   def index
     respond_to do |format|
@@ -27,10 +27,10 @@ class TemplatesController < ApplicationController
   end
 
   def create
-    normalize_params! params[:template]
+    normalize_params! params.to_unsafe_h[:template]
     @title = _("Create Template")
 
-    @primitive = Template.new params[:template]
+    @primitive = Template.new params.to_unsafe_h[:template]
 
     respond_to do |format|
       if @primitive.save
@@ -77,15 +77,15 @@ class TemplatesController < ApplicationController
   end
 
   def update
-    normalize_params! params[:template]
+    normalize_params! params.to_unsafe_h[:template]
     @title = _("Edit Template")
 
-    if params[:revert]
+    if params.to_unsafe_h[:revert]
       return redirect_to edit_cib_template_url(cib_id: @cib.id, id: @primitive.id)
     end
 
     respond_to do |format|
-      if @primitive.update_attributes(params[:template])
+      if @primitive.update_attributes(params.to_unsafe_h[:template])
         post_process_for! @primitive
 
         format.html do
@@ -159,7 +159,7 @@ class TemplatesController < ApplicationController
   end
 
   def set_record
-    @primitive = Template.find params[:id]
+    @primitive = Template.find params.to_unsafe_h[:id]
 
     unless @primitive
       respond_to do |format|

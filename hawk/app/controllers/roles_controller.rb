@@ -2,12 +2,12 @@
 # See COPYING for license.
 
 class RolesController < ApplicationController
-  before_filter :login_required
-  before_filter :feature_support
-  before_filter :set_title
-  before_filter :set_cib
-  before_filter :set_record, only: [:edit, :update, :destroy, :show]
-  before_filter :check_support
+  before_action :login_required
+  before_action :feature_support
+  before_action :set_title
+  before_action :set_cib
+  before_action :set_record, only: [:edit, :update, :destroy, :show]
+  before_action :check_support
 
   def index
     respond_to do |format|
@@ -29,7 +29,7 @@ class RolesController < ApplicationController
 
   def create
     @title = _("Create Role")
-    @role = Role.new params[:role]
+    @role = Role.new params.to_unsafe_h[:role]
 
     respond_to do |format|
       if @role.save
@@ -62,12 +62,12 @@ class RolesController < ApplicationController
   def update
     @title = _("Edit Role")
 
-    if params[:revert]
+    if params.to_unsafe_h[:revert]
       return redirect_to edit_cib_role_url(cib_id: @cib.id, id: @role.id)
     end
 
     respond_to do |format|
-      if @role.update_attributes(params[:role])
+      if @role.update_attributes(params.to_unsafe_h[:role])
         post_process_for! @role
 
         format.html do
@@ -141,7 +141,7 @@ class RolesController < ApplicationController
   end
 
   def set_record
-    @role = Role.find params[:id]
+    @role = Role.find params.to_unsafe_h[:id]
 
     unless @role
       respond_to do |format|

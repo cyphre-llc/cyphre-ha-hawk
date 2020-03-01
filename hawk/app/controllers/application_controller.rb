@@ -9,14 +9,14 @@ class ApplicationController < ActionController::Base
 
   layout :detect_current_layout
 
-  around_filter :inject_current_user
-  around_filter :inject_current_cib
-  before_filter :set_users_locale
-  before_filter :set_current_home
-  before_filter :set_current_title
-  before_filter :set_shadow_cib
-  before_filter :cors_preflight_check
-  after_filter :cors_set_access_control_headers
+  around_action :inject_current_user
+  around_action :inject_current_cib
+  before_action :set_users_locale
+  before_action :set_current_home
+  before_action :set_current_title
+  before_action :set_shadow_cib
+  before_action :cors_preflight_check
+  after_action :cors_set_access_control_headers
 
   helper_method :is_god?
   helper_method :logged_in?
@@ -57,11 +57,11 @@ class ApplicationController < ActionController::Base
     if current_user
       @current_cib ||= begin
         # backwards compatibility
-        if params[:cib_id] == "mini"
-          params[:mini] = "true"
-          params[:cib_id] = production_cib
+        if params.to_unsafe_h[:cib_id] == "mini"
+          params.to_unsafe_h[:mini] = "true"
+          params.to_unsafe_h[:cib_id] = production_cib
         end
-        Cib.new(params[:cib_id] || production_cib, current_user, params[:debug] == "file", cookies[:stonithwarning].nil? || cookies[:stonithwarning] == true)
+        Cib.new(params.to_unsafe_h[:cib_id] || production_cib, current_user, params.to_unsafe_h[:debug] == "file", cookies[:stonithwarning].nil? || cookies[:stonithwarning] == true)
       end
     end
   end
@@ -99,7 +99,7 @@ class ApplicationController < ActionController::Base
   end
 
   def set_users_locale
-    available = [params[:locale], cookies[:locale], default_locale].compact.first
+    available = [params.to_unsafe_h[:locale], cookies[:locale], default_locale].compact.first
     I18n.locale = FastGettext.set_locale(available)
     cookies[:locale] = FastGettext.locale unless cookies[:locale] == FastGettext.locale
   end
@@ -141,7 +141,7 @@ class ApplicationController < ActionController::Base
       return
     end
 
-    init_cib = params[:init_cib].to_s.downcase == "true"
+    init_cib = params.to_unsafe_h[:init_cib].to_s.downcase == "true"
     result = nil
     ENV['CIB_shadow'] = current_cib.id
     if init_cib || !File.exist?("/var/lib/pacemaker/cib/shadow.#{current_cib.id}")

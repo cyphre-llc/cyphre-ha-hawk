@@ -2,11 +2,11 @@
 # See COPYING for license.
 
 class WizardsController < ApplicationController
-  before_filter :login_required
-  before_filter :set_title
-  before_filter :set_cib
-  before_filter :cib_writable
-  before_filter :cluster_online
+  before_action :login_required
+  before_action :set_title
+  before_action :set_cib
+  before_action :cib_writable
+  before_action :cluster_online
 
   def index
     @wizards = Wizard.all
@@ -17,9 +17,9 @@ class WizardsController < ApplicationController
   end
 
   def show
-    session[:hawk_wizard] = params[:id]
-    @wizard = Wizard.find params[:id]
-    pa = Rails.cache.read("#{session.id}-#{params[:id]}")
+    session[:hawk_wizard] = params.to_unsafe_h[:id]
+    @wizard = Wizard.find params.to_unsafe_h[:id]
+    pa = Rails.cache.read("#{session.id}-#{params.to_unsafe_h[:id]}")
     @wizard.update_step_values(@wizard, pa) if pa
 
     respond_to do |format|
@@ -28,10 +28,10 @@ class WizardsController < ApplicationController
   end
 
   def update
-    @wizard = Wizard.find params[:id]
+    @wizard = Wizard.find params.to_unsafe_h[:id]
     pa = build_scriptparams(params)
     @pa = pa
-    Rails.cache.write("#{session.id}-#{params[:id]}", pa, expires_in: 1.hour)
+    Rails.cache.write("#{session.id}-#{params.to_unsafe_h[:id]}", pa, expires_in: 1.hour)
     @wizard.verify(pa)
 
     respond_to do |format|
@@ -40,20 +40,20 @@ class WizardsController < ApplicationController
   end
 
   def submit
-    pa = JSON.parse(params[:pa]) if params[:pa]
-    pa = Rails.cache.read("#{session.id}-#{params[:id]}") if pa.nil?
+    pa = JSON.parse(params.to_unsafe_h[:pa]) if params.to_unsafe_h[:pa]
+    pa = Rails.cache.read("#{session.id}-#{params.to_unsafe_h[:id]}") if pa.nil?
 
     if pa.nil?
       render json: [_("Session has expired")], status: :unprocessable_entity
     else
-      @wizard = Wizard.find params[:id]
+      @wizard = Wizard.find params.to_unsafe_h[:id]
       @wizard.verify(pa)
       if @wizard.errors.length > 0
         render json: @wizard.errors.to_json, status: :unprocessable_entity
       elsif current_cib.sim? && @wizard.need_rootpw
         render json: [_("Wizard cannot be applied when the simulator is active")], status: :unprocessable_entity
       else
-        @wizard.run(pa, params[:rootpw])
+        @wizard.run(pa, params.to_unsafe_h[:rootpw])
         if @wizard.errors.length > 0
           render json: @wizard.errors.to_json, status: :unprocessable_entity
         else
@@ -82,7 +82,7 @@ class WizardsController < ApplicationController
         next if basestep_idx.nil?
 
         basestep = @wizard.steps[basestep_idx]
-        next unless basestep.required || (params.key?("enable:#{basestep.id}") && params["enable:#{basestep.id}"] != "false")
+        next unless basestep.required || (params.key?("enable:#{basestep.id}") && params.to_unsafe_h["enable:#{basestep.id}"] != "false")
 
         name = path.last
         sub = sp

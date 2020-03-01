@@ -2,12 +2,12 @@
 # See COPYING for license.
 
 class UsersController < ApplicationController
-  before_filter :login_required
-  before_filter :feature_support
-  before_filter :set_title
-  before_filter :set_cib
-  before_filter :set_record, only: [:edit, :update, :destroy, :show]
-  before_filter :check_support
+  before_action :login_required
+  before_action :feature_support
+  before_action :set_title
+  before_action :set_cib
+  before_action :set_record, only: [:edit, :update, :destroy, :show]
+  before_action :check_support
 
   def index
     respond_to do |format|
@@ -29,7 +29,7 @@ class UsersController < ApplicationController
 
   def create
     @title = _("Create ACL Target")
-    @user = User.new params[:user]
+    @user = User.new params.to_unsafe_h[:user]
 
     respond_to do |format|
       if @user.save
@@ -64,12 +64,12 @@ class UsersController < ApplicationController
   def update
     @title = _("Edit ACL Target")
 
-    if params[:revert]
+    if params.to_unsafe_h[:revert]
       return redirect_to edit_cib_user_url(cib_id: @cib.id, id: @user.id)
     end
 
     respond_to do |format|
-      if @user.update_attributes(params[:user])
+      if @user.update_attributes(params.to_unsafe_h[:user])
         post_process_for! @user
 
         format.html do
@@ -143,7 +143,7 @@ class UsersController < ApplicationController
   end
 
   def set_record
-    @user = User.find params[:id]
+    @user = User.find params.to_unsafe_h[:id]
 
     unless @user
       respond_to do |format|

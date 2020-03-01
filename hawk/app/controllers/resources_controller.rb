@@ -2,9 +2,9 @@
 # See COPYING for license.
 
 class ResourcesController < ApplicationController
-  before_filter :login_required
-  before_filter :set_title
-  before_filter :set_cib
+  before_action :login_required
+  before_action :set_title
+  before_action :set_cib
 
   def index
     respond_to do |format|
@@ -69,7 +69,7 @@ class ResourcesController < ApplicationController
   end
 
   def show
-    @resource = Resource.find params[:id]
+    @resource = Resource.find params.to_unsafe_h[:id]
 
     respond_to do |format|
       format.html
@@ -77,7 +77,7 @@ class ResourcesController < ApplicationController
   end
 
   def events
-    @resource = Resource.find params[:id]
+    @resource = Resource.find params.to_unsafe_h[:id]
 
     respond_to do |format|
       format.html
@@ -85,72 +85,72 @@ class ResourcesController < ApplicationController
   end
 
   def start
-    @resource = Resource.find params[:id]
+    @resource = Resource.find params.to_unsafe_h[:id]
     run_resource_action @resource.start!,
                         _("Successfully started the resource"),
                         _("Failed to start the resource: %{err}")
   end
 
   def stop
-    @resource = Resource.find params[:id]
+    @resource = Resource.find params.to_unsafe_h[:id]
     run_resource_action @resource.stop!,
                         _("Successfully stopped the resource"),
                         _("Failed to stop the resource: %{err}")
   end
 
   def promote
-    @resource = Resource.find params[:id]
+    @resource = Resource.find params.to_unsafe_h[:id]
     run_resource_action @resource.promote!,
                         _("Successfully promoted the resource"),
                         _("Failed to promote the resource: %{err}")
   end
 
   def demote
-    @resource = Resource.find params[:id]
+    @resource = Resource.find params.to_unsafe_h[:id]
     run_resource_action @resource.demote!,
                         _("Successfully demoted the resource"),
                         _("Failed to demote the resource: %{err}")
   end
 
   def maintenance_on
-    @resource = Resource.find params[:id]
+    @resource = Resource.find params.to_unsafe_h[:id]
     run_resource_action @resource.maintenance!("on"),
                         _("Successfully set the resource in maintenance mode"),
                         _("Failed to set the resource in maintenance mode: %{err}")
   end
 
   def maintenance_off
-    @resource = Resource.find params[:id]
+    @resource = Resource.find params.to_unsafe_h[:id]
     run_resource_action @resource.maintenance!("off"),
                         _("Successfully disabled maintenance mode for resource"),
                         _("Failed to disable maintenance mode for resource: %{err}")
   end
 
   def unmigrate
-    @resource = Resource.find params[:id]
+    @resource = Resource.find params.to_unsafe_h[:id]
     run_resource_action @resource.unmigrate!,
                         _("Successfully unmigrated the resource"),
                         _("Failed to unmigrate the resource: %{err}")
   end
 
   def migrate
-    @resource = Resource.find params[:id]
-    run_resource_action @resource.migrate!(params[:node]),
+    @resource = Resource.find params.to_unsafe_h[:id]
+    run_resource_action @resource.migrate!(params.to_unsafe_h[:node]),
                         _("Successfully migrated the resource"),
                         _("Failed to migrate the resource: %{err}")
   end
 
   def cleanup
-    @resource = Resource.find params[:id]
-    run_resource_action @resource.cleanup!(params[:node]),
+    @resource = Resource.find params.to_unsafe_h[:id]
+    run_resource_action @resource.cleanup!(params.to_unsafe_h[:node]),
                         _("Successfully cleaned the resource"),
                         _("Failed to clean up the resource: %{err}")
   end
 
   def rename
-    from = params[:id]
-    to = params[:to]
-    @source = params[:source] || "edit"
+    from = params.to_unsafe_h[:id]
+    to = params.to_unsafe_h[:to]
+    @source = params.to_unsafe_h[:source] || "edit"
     @resource = Resource.find from
 
     if to.nil?
@@ -193,16 +193,16 @@ class ResourcesController < ApplicationController
 
   def new
     # redirect depending on type of resource
-    resource = Resource.find params[:id]
+    resource = Resource.find params.to_unsafe_h[:id]
     new_url = "new_cib_#{resource.object_type}_url".to_sym
-    redirect_to send(new_url, cib_id: @cib.id, id: params[:id])
+    redirect_to send(new_url, cib_id: @cib.id, id: params.to_unsafe_h[:id])
   end
 
   def edit
     # redirect depending on type of resource
-    resource = Resource.find params[:id]
+    resource = Resource.find params.to_unsafe_h[:id]
     edit_url = "edit_cib_#{resource.object_type}_url".to_sym
-    redirect_to send(edit_url, cib_id: @cib.id, id: params[:id])
+    redirect_to send(edit_url, cib_id: @cib.id, id: params.to_unsafe_h[:id])
   end
 
   protected
@@ -216,9 +216,9 @@ class ResourcesController < ApplicationController
   end
 
   def default_base_layout
-    if ["index", "types"].include? params[:action]
+    if ["index", "types"].include? params.to_unsafe_h[:action]
       "withrightbar"
-    elsif params[:action] == "show" || params[:action] == "events" || params[:action] == "rename"
+    elsif params.to_unsafe_h[:action] == "show" || params.to_unsafe_h[:action] == "events" || params.to_unsafe_h[:action] == "rename"
       "modal"
     else
       super

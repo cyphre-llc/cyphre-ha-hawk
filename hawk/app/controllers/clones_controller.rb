@@ -2,10 +2,10 @@
 # See COPYING for license.
 
 class ClonesController < ApplicationController
-  before_filter :login_required
-  before_filter :set_title
-  before_filter :set_cib
-  before_filter :set_record, only: [:edit, :update, :destroy, :show]
+  before_action :login_required
+  before_action :set_title
+  before_action :set_cib
+  before_action :set_record, only: [:edit, :update, :destroy, :show]
 
   def index
     respond_to do |format|
@@ -27,10 +27,10 @@ class ClonesController < ApplicationController
   end
 
   def create
-    normalize_params! params[:clone]
+    normalize_params! params.to_unsafe_h[:clone]
     @title = _("Create Clone")
 
-    @clone = Clone.new params[:clone]
+    @clone = Clone.new params.to_unsafe_h[:clone]
 
     respond_to do |format|
       if @clone.save
@@ -63,15 +63,15 @@ class ClonesController < ApplicationController
   end
 
   def update
-    normalize_params! params[:clone]
+    normalize_params! params.to_unsafe_h[:clone]
     @title = _("Edit Clone")
 
-    if params[:revert]
+    if params.to_unsafe_h[:revert]
       return redirect_to edit_cib_clone_url(cib_id: @cib.id, id: @clone.id)
     end
 
     respond_to do |format|
-      if @clone.update_attributes(params[:clone])
+      if @clone.update_attributes(params.to_unsafe_h[:clone])
         post_process_for! @clone
 
         format.html do
@@ -139,7 +139,7 @@ class ClonesController < ApplicationController
   end
 
   def set_record
-    @clone = Clone.find params[:id]
+    @clone = Clone.find params.to_unsafe_h[:id]
 
     unless @clone
       respond_to do |format|

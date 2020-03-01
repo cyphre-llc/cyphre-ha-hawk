@@ -2,10 +2,10 @@
 # See COPYING for license.
 
 class PrimitivesController < ApplicationController
-  before_filter :login_required
-  before_filter :set_title
-  before_filter :set_cib
-  before_filter :set_record, only: [:edit, :update, :destroy, :show, :copy]
+  before_action :login_required
+  before_action :set_title
+  before_action :set_cib
+  before_action :set_record, only: [:edit, :update, :destroy, :show, :copy]
 
   def index
     respond_to do |format|
@@ -20,7 +20,7 @@ class PrimitivesController < ApplicationController
     @title = _("Create Primitive")
     @primitive = Primitive.new
     @primitive.meta["target-role"] = "Stopped" if @cib.id == "live"
-    @primitive.parent = params[:parent] unless params[:parent].nil?
+    @primitive.parent = params.to_unsafe_h[:parent] unless params.to_unsafe_h[:parent].nil?
 
     respond_to do |format|
       format.html
@@ -31,10 +31,10 @@ class PrimitivesController < ApplicationController
   end
 
   def create
-    normalize_params! params[:primitive]
+    normalize_params! params.to_unsafe_h[:primitive]
     @title = _("Create Primitive")
 
-    @primitive = Primitive.new params[:primitive]
+    @primitive = Primitive.new params.to_unsafe_h[:primitive]
 
     fail CreateFailure, @primitive.errors.full_messages.to_sentence unless @primitive.save
     post_process_for! @primitive
@@ -98,15 +98,15 @@ class PrimitivesController < ApplicationController
   end
 
   def update
-    normalize_params! params[:primitive]
+    normalize_params! params.to_unsafe_h[:primitive]
     @title = _("Edit Primitive")
 
-    if params[:revert]
+    if params.to_unsafe_h[:revert]
       return redirect_to edit_cib_primitive_url(cib_id: @cib.id, id: @primitive.id)
     end
 
     respond_to do |format|
-      if @primitive.update_attributes(params[:primitive])
+      if @primitive.update_attributes(params.to_unsafe_h[:primitive])
         post_process_for! @primitive
 
         format.html do
@@ -174,7 +174,7 @@ class PrimitivesController < ApplicationController
   end
 
   def set_record
-    @primitive = Primitive.find params[:id]
+    @primitive = Primitive.find params.to_unsafe_h[:id]
 
     unless @primitive
       respond_to do |format|

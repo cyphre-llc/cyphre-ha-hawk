@@ -2,9 +2,9 @@
 # See COPYING for license.
 
 class ConstraintsController < ApplicationController
-  before_filter :login_required
-  before_filter :set_title
-  before_filter :set_cib
+  before_action :login_required
+  before_action :set_title
+  before_action :set_cib
 
   def index
     respond_to do |format|
@@ -30,7 +30,7 @@ class ConstraintsController < ApplicationController
   end
 
   def show
-    @constraint = Constraint.find params[:id]
+    @constraint = Constraint.find params.to_unsafe_h[:id]
 
     respond_to do |format|
       format.html
@@ -39,22 +39,22 @@ class ConstraintsController < ApplicationController
 
   def new
     # redirect depending on type of resource
-    constraint = Constraint.find params[:id]
+    constraint = Constraint.find params.to_unsafe_h[:id]
     new_url = "new_cib_#{constraint.object_type}_url".to_sym
-    redirect_to send(new_url, cib_id: @cib.id, id: params[:id])
+    redirect_to send(new_url, cib_id: @cib.id, id: params.to_unsafe_h[:id])
   end
 
   def edit
     # redirect depending on type of resource
-    constraint = Constraint.find params[:id]
+    constraint = Constraint.find params.to_unsafe_h[:id]
     edit_url = "edit_cib_#{constraint.object_type}_url".to_sym
-    redirect_to send(edit_url, cib_id: @cib.id, id: params[:id])
+    redirect_to send(edit_url, cib_id: @cib.id, id: params.to_unsafe_h[:id])
   end
 
   def rename
-    from = params[:id]
-    to = params[:to]
-    @source = params[:source] || "edit"
+    from = params.to_unsafe_h[:id]
+    to = params.to_unsafe_h[:to]
+    @source = params.to_unsafe_h[:source] || "edit"
     @constraint = Constraint.find from
 
     if to.nil?
@@ -106,10 +106,10 @@ class ConstraintsController < ApplicationController
   end
 
   def default_base_layout
-    if ["index", "types"].include? params[:action]
+    if ["index", "types"].include? params.to_unsafe_h[:action]
       "withrightbar"
     else
-      if params[:action] == "show"
+      if params.to_unsafe_h[:action] == "show"
         "modal"
       else
         super

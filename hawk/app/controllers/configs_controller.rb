@@ -3,14 +3,14 @@
 # See COPYING for license.
 
 class ConfigsController < ApplicationController
-  before_filter :login_required
-  skip_before_filter :verify_authenticity_token
+  before_action :login_required
+  skip_before_action :verify_authenticity_token
 
   def show
     respond_to do |format|
       format.html do
         cmd = "show"
-        cmd = "show xml" if params[:xml] == "true"
+        cmd = "show xml" if params.to_unsafe_h[:xml] == "true"
         out, err, rc = Invoker.instance.no_log do |invoker|
           invoker.crm_configure cmd
         end
@@ -18,12 +18,12 @@ class ConfigsController < ApplicationController
           format.any { head :internal_server_error }
         else
           @cibtext = out
-          @xml = params[:xml] == "true"
+          @xml = params.to_unsafe_h[:xml] == "true"
           render
         end
       end
       format.json do
-        render json: current_cib.status(params[:id] == "mini" || params[:mini] == "true")
+        render json: current_cib.status(params.to_unsafe_h[:id] == "mini" || params.to_unsafe_h[:mini] == "true")
       end
       format.xml do
         out, err, rc = Invoker.instance.no_log do |invoker|
@@ -74,7 +74,7 @@ class ConfigsController < ApplicationController
   protected
 
   def detect_modal_layout
-    if request.xhr? && params[:action] == :meta
+    if request.xhr? && params.to_unsafe_h[:action] == :meta
       "modal"
     else
       detect_current_layout

@@ -2,10 +2,10 @@
 # See COPYING for license.
 
 class TagsController < ApplicationController
-  before_filter :login_required
-  before_filter :set_title
-  before_filter :set_cib
-  before_filter :set_record, only: [:edit, :update, :destroy, :show]
+  before_action :login_required
+  before_action :set_title
+  before_action :set_cib
+  before_action :set_record, only: [:edit, :update, :destroy, :show]
 
   def index
     respond_to do |format|
@@ -26,10 +26,10 @@ class TagsController < ApplicationController
   end
 
   def create
-    normalize_params! params[:tag]
+    normalize_params! params.to_unsafe_h[:tag]
     @title = _("Create Tag")
 
-    @tag = Tag.new params[:tag]
+    @tag = Tag.new params.to_unsafe_h[:tag]
 
     respond_to do |format|
       if @tag.save
@@ -62,15 +62,15 @@ class TagsController < ApplicationController
   end
 
   def update
-    normalize_params! params[:tag]
+    normalize_params! params.to_unsafe_h[:tag]
     @title = _("Edit Tag")
 
-    if params[:revert]
+    if params.to_unsafe_h[:revert]
       return redirect_to edit_cib_tag_url(cib_id: @cib.id, id: @tag.id)
     end
 
     respond_to do |format|
-      if @tag.update_attributes(params[:tag])
+      if @tag.update_attributes(params.to_unsafe_h[:tag])
         post_process_for! @tag
 
         format.html do
@@ -138,7 +138,7 @@ class TagsController < ApplicationController
   end
 
   def set_record
-    @tag = Tag.find params[:id]
+    @tag = Tag.find params.to_unsafe_h[:id]
 
     unless @tag
       respond_to do |format|

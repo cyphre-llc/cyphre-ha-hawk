@@ -2,9 +2,9 @@
 # See COPYING for license.
 
 class SimulatorController < ApplicationController
-  before_filter :login_required
-  before_filter :set_title
-  before_filter :set_cib
+  before_action :login_required
+  before_action :set_title
+  before_action :set_cib
 
   def run
     if current_cib.id == "live"
@@ -19,7 +19,7 @@ class SimulatorController < ApplicationController
     sim_reload_state
 
     injections = []
-    params[:injections].each do |i|
+    params.to_unsafe_h[:injections].each do |i|
       parts = i.split(/\s+/)
       case parts[0]
       when "node"
@@ -50,7 +50,7 @@ class SimulatorController < ApplicationController
           end
         end
       end
-    end if params[:injections]
+    end if params.to_unsafe_h[:injections]
     f = File.new("#{Rails.root}/tmp/sim.info", "w")
     # "live", but will be against shadow CIB
     out, err, status = Invoker.instance.crm_simulate(
@@ -86,7 +86,7 @@ class SimulatorController < ApplicationController
 
   # TODO(must): make sure dot is installed
   def result
-    case params[:file]
+    case params.to_unsafe_h[:file]
     when "info"
       send_data File.new("#{Rails.root}/tmp/sim.info").read,
                 type: "text/plain", disposition: :inline
@@ -94,14 +94,14 @@ class SimulatorController < ApplicationController
       shadow_id = ENV["CIB_shadow"]
       begin
         ENV.delete("CIB_shadow")
-        send_data Invoker.instance.cibadmin('-Ql'), type: (params[:munge] == "txt" ? "text/plain" : "text/xml"), disposition: :inline
+        send_data Invoker.instance.cibadmin('-Ql'), type: (params.to_unsafe_h[:munge] == "txt" ? "text/plain" : "text/xml"), disposition: :inline
       ensure
         ENV["CIB_shadow"] = shadow_id
       end
     when "out"
-      send_data Invoker.instance.cibadmin('-Ql'), type: (params[:munge] == "txt" ? "text/plain" : "text/xml"), disposition: :inline
+      send_data Invoker.instance.cibadmin('-Ql'), type: (params.to_unsafe_h[:munge] == "txt" ? "text/plain" : "text/xml"), disposition: :inline
     when "graph-xml"
-      send_data File.new("#{Rails.root}/tmp/sim.graph").read, type: (params[:munge] == "txt" ? "text/plain" : "text/xml"), disposition: :inline
+      send_data File.new("#{Rails.root}/tmp/sim.graph").read, type: (params.to_unsafe_h[:munge] == "txt" ? "text/plain" : "text/xml"), disposition: :inline
     when "diff"
       shadow_id = ENV["CIB_shadow"]
       begin
@@ -144,10 +144,10 @@ class SimulatorController < ApplicationController
   # resources, or more if there's depths etc.).
   def intervals
     intervals = []
-    res = Primitive.find params[:id]  # RORSCAN_ITL (authz via cibadmin)
+    res = Primitive.find params.to_unsafe_h[:id]  # RORSCAN_ITL (authz via cibadmin)
     Rails.logger.debug "#{res.ops}"
     res.ops["monitor"].each do |op|
-      Rails.logger.debug "#{params[:id]}, #{op}"
+      Rails.logger.debug "#{params.to_unsafe_h[:id]}, #{op}"
       intervals << Util.crm_get_msec(op["interval"])
     end if res.ops.key?("monitor")
     render json: intervals
@@ -168,7 +168,7 @@ class SimulatorController < ApplicationController
   end
 
   def default_base_layout
-    if ["help"].include? params[:action]
+    if ["help"].include? params.to_unsafe_h[:action]
       "modal"
     else
       super

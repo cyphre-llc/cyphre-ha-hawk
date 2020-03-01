@@ -2,10 +2,10 @@
 # See COPYING for license.
 
 class TicketsController < ApplicationController
-  before_filter :login_required
-  before_filter :set_title
-  before_filter :set_cib
-  before_filter :set_record, only: [:edit, :update, :destroy]
+  before_action :login_required
+  before_action :set_title
+  before_action :set_cib
+  before_action :set_record, only: [:edit, :update, :destroy]
 
   rescue_from Constraint::CommandError do |e|
     Rails.logger.error e
@@ -39,10 +39,10 @@ class TicketsController < ApplicationController
   end
 
   def create
-    normalize_params! params[:ticket]
+    normalize_params! params.to_unsafe_h[:ticket]
     @title = _("Create Ticket")
 
-    @ticket = Ticket.new params[:ticket]
+    @ticket = Ticket.new params.to_unsafe_h[:ticket]
 
     respond_to do |format|
       if @ticket.save
@@ -75,15 +75,15 @@ class TicketsController < ApplicationController
   end
 
   def update
-    normalize_params! params[:ticket]
+    normalize_params! params.to_unsafe_h[:ticket]
     @title = _("Edit Ticket")
 
-    if params[:revert]
+    if params.to_unsafe_h[:revert]
       return redirect_to edit_cib_ticket_url(cib_id: @cib.id, id: @ticket.id)
     end
 
     respond_to do |format|
-      if @ticket.update_attributes(params[:ticket])
+      if @ticket.update_attributes(params.to_unsafe_h[:ticket])
         post_process_for! @ticket
 
         format.html do
@@ -132,7 +132,7 @@ class TicketsController < ApplicationController
   end
 
   def show
-    @ticket = @cib.tickets[params[:id]]
+    @ticket = @cib.tickets[params.to_unsafe_h[:id]]
 
     respond_to do |format|
       format.json do
@@ -145,7 +145,7 @@ class TicketsController < ApplicationController
 
   def grant
     site = @cib.booth[:me]
-    if grant_ticket(params[:ticket], site)
+    if grant_ticket(params.to_unsafe_h[:ticket], site)
       respond_to do |format|
         format.html do
           flash[:success] = _("Successfully granted the ticket")
@@ -169,7 +169,7 @@ class TicketsController < ApplicationController
   end
 
   def revoke
-    if revoke_ticket(params[:ticket])
+    if revoke_ticket(params.to_unsafe_h[:ticket])
       respond_to do |format|
         format.html do
           flash[:success] = _("Successfully revoked the ticket")
@@ -220,7 +220,7 @@ class TicketsController < ApplicationController
   end
 
   def set_record
-    @ticket = Ticket.find params[:id]
+    @ticket = Ticket.find params.to_unsafe_h[:id]
 
     unless @ticket
       respond_to do |format|
@@ -236,18 +236,18 @@ class TicketsController < ApplicationController
   end
 
   def normalize_params!(current)
-    if params[:ticket][:resources].nil?
-      params[:ticket][:resources] = []
+    if params.to_unsafe_h[:ticket][:resources].nil?
+      params.to_unsafe_h[:ticket][:resources] = []
     else
-      params[:ticket][:resources] = params[:ticket][:resources].values
+      params.to_unsafe_h[:ticket][:resources] = params.to_unsafe_h[:ticket][:resources].values
     end
   end
 
   def default_base_layout
-    if ["index", "types", "edit", "new"].include? params[:action]
+    if ["index", "types", "edit", "new"].include? params.to_unsafe_h[:action]
       "withrightbar"
     else
-      if params[:action] == "show"
+      if params.to_unsafe_h[:action] == "show"
         "modal"
       else
         super

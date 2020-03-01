@@ -2,10 +2,10 @@
 # See COPYING for license.
 
 class NodesController < ApplicationController
-  before_filter :login_required
-  before_filter :set_title
-  before_filter :set_cib
-  before_filter :set_record, only: [:online, :standby, :maintenance, :ready, :fence, :clearstate, :show, :events, :edit, :update]
+  before_action :login_required
+  before_action :set_title
+  before_action :set_cib
+  before_action :set_record, only: [:online, :standby, :maintenance, :ready, :fence, :clearstate, :show, :events, :edit, :update]
 
   rescue_from Node::CommandError do |e|
     Rails.logger.error e
@@ -36,10 +36,10 @@ class NodesController < ApplicationController
   end
 
   def update
-    return redirect_to edit_cib_node_url(cib_id: @cib.id, id: @node.id) if params[:revert]
+    return redirect_to edit_cib_node_url(cib_id: @cib.id, id: @node.id) if params.to_unsafe_h[:revert]
 
     respond_to do |format|
-      if @node.update_attributes(params[:node])
+      if @node.update_attributes(params.to_unsafe_h[:node])
         format.html do
           flash[:success] = _("Node updated successfully")
           redirect_to edit_cib_node_url(cib_id: @cib.id, id: @node.id)
@@ -108,7 +108,7 @@ class NodesController < ApplicationController
   end
 
   def set_record
-    @node = @cib.find_node params[:id]
+    @node = @cib.find_node params.to_unsafe_h[:id]
 
     unless @node
       respond_to do |format|
@@ -124,7 +124,7 @@ class NodesController < ApplicationController
   end
 
   def detect_modal_layout
-    if request.xhr? && (params[:action] == :show || params[:action] == :events)
+    if request.xhr? && (params.to_unsafe_h[:action] == :show || params.to_unsafe_h[:action] == :events)
       "modal"
     else
       detect_current_layout

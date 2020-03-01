@@ -2,8 +2,8 @@
 # See COPYING for license.
 
 class DashboardsController < ApplicationController
-  before_filter :login_required
-  before_filter :set_title
+  before_action :login_required
+  before_action :set_title
 
   def show
     @clusters = Cluster.all
@@ -13,8 +13,8 @@ class DashboardsController < ApplicationController
 
   def add
     if request.post?
-      Rails.logger.debug "Creating from #{params[:cluster]}"
-      @cluster = Cluster.new params[:cluster]
+      Rails.logger.debug "Creating from #{params.to_unsafe_h[:cluster]}"
+      @cluster = Cluster.new params.to_unsafe_h[:cluster]
       if @cluster.save
       # flash[:success] = _("Cluster added successfully")
       # redirect_to action: "show"
@@ -30,7 +30,7 @@ class DashboardsController < ApplicationController
 
   def remove
     if request.post?
-      name = params[:name]
+      name = params.to_unsafe_h[:name]
       out, err, rc = Cluster.remove(name)
       if rc == 0
         render json: {"name" => name }

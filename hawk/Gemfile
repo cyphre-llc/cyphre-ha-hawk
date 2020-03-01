@@ -3,11 +3,11 @@
 
 source 'https://rubygems.org'
 
-gem "rails", "~> 4.2.0"
+gem "rails", "~> 5.1.4"
 gem "sass-rails", "~> 5.0.1"
 gem "virtus", "~> 1.0.4"
 gem "js-routes", "~> 1.0"
-gem "tilt", "~> 1.4.1"
+gem "tilt", "~> 2.0.9"
 gem "fast_gettext", ">= 0.9.2"
 gem "gettext_i18n_rails_js", "~> 1.0"
 gem "gettext_i18n_rails", "~> 1.2"
@@ -24,17 +24,13 @@ group :development do
 end
 
 group :test do
-  if ENV["RAILS_ENV"] == "test"
-    source "https://rubygems.org"
+  source "https://rubygems.org"
 
-    gem "rubocop"
-    gem "rake"
-    gem "brakeman"
+  gem "rubocop"
+  gem "rake"
+  gem "brakeman"
 
-    gem "rspec-rails", "~> 3.4.2"
-    gem "capybara", "~> 2.7.1"
-    gem "guard-rspec", "~> 4.7.2"
-  end
+  gem "rspec-rails"
+  gem "capybara", "~> 2.7.1"
+  gem "guard-rspec", "~> 4.7.2"
 end
-
-instance_eval(File.read("Gemfile.local")) if File.exist? "Gemfile.local"

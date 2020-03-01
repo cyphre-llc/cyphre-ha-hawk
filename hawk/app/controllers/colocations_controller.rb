@@ -2,10 +2,10 @@
 # See COPYING for license.
 
 class ColocationsController < ApplicationController
-  before_filter :login_required
-  before_filter :set_title
-  before_filter :set_cib
-  before_filter :set_record, only: [:edit, :update, :destroy, :show]
+  before_action :login_required
+  before_action :set_title
+  before_action :set_cib
+  before_action :set_record, only: [:edit, :update, :destroy, :show]
 
   def index
     respond_to do |format|
@@ -26,10 +26,10 @@ class ColocationsController < ApplicationController
   end
 
   def create
-    normalize_params! params[:colocation]
+    normalize_params! params.to_unsafe_h[:colocation]
     @title = _("Create Colocation")
 
-    @colocation = Colocation.new params[:colocation]
+    @colocation = Colocation.new params.to_unsafe_h[:colocation]
 
     respond_to do |format|
       if @colocation.save
@@ -62,15 +62,15 @@ class ColocationsController < ApplicationController
   end
 
   def update
-    normalize_params! params[:colocation]
+    normalize_params! params.to_unsafe_h[:colocation]
     @title = _("Edit Colocation")
 
-    if params[:revert]
+    if params.to_unsafe_h[:revert]
       return redirect_to edit_cib_colocation_url(cib_id: @cib.id, id: @colocation.id)
     end
 
     respond_to do |format|
-      if @colocation.update_attributes(params[:colocation])
+      if @colocation.update_attributes(params.to_unsafe_h[:colocation])
         post_process_for! @colocation
 
         format.html do
@@ -137,7 +137,7 @@ class ColocationsController < ApplicationController
   end
 
   def set_record
-    @colocation = Colocation.find params[:id]
+    @colocation = Colocation.find params.to_unsafe_h[:id]
 
     unless @colocation
       respond_to do |format|
@@ -153,10 +153,10 @@ class ColocationsController < ApplicationController
   end
 
   def normalize_params!(current)
-    if params[:colocation][:resources].nil?
-      params[:colocation][:resources] = []
+    if params.to_unsafe_h[:colocation][:resources].nil?
+      params.to_unsafe_h[:colocation][:resources] = []
     else
-      params[:colocation][:resources] = params[:colocation][:resources].values
+      params.to_unsafe_h[:colocation][:resources] = params.to_unsafe_h[:colocation][:resources].values
     end
   end
 

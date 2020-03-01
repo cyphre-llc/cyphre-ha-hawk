@@ -2,10 +2,10 @@
 # See COPYING for license.
 
 class CrmConfigController < ApplicationController
-  before_filter :login_required
-  before_filter :set_title
-  before_filter :set_cib
-  before_filter :set_record, only: [:edit, :update]
+  before_action :login_required
+  before_action :set_title
+  before_action :set_cib
+  before_action :set_record, only: [:edit, :update]
 
   def edit
     respond_to do |format|
@@ -14,12 +14,12 @@ class CrmConfigController < ApplicationController
   end
 
   def update
-    if params[:revert]
+    if params.to_unsafe_h[:revert]
       return redirect_to edit_cib_crm_config_url(cib_id: @cib.id)
     end
 
     respond_to do |format|
-      if @crm_config.update_attributes(params[:crm_config])
+      if @crm_config.update_attributes(params.to_unsafe_h[:crm_config])
         post_process_for! @crm_config
 
         format.html do
