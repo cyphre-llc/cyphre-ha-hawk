@@ -153,10 +153,10 @@ class ColocationsController < ApplicationController
   end
 
   def normalize_params!(current)
-    if params.to_unsafe_h[:colocation][:resources].nil?
-      params.to_unsafe_h[:colocation][:resources] = []
+    if params[:colocation][:resources].nil?
+      params[:colocation][:resources] = []
     else
-      params.to_unsafe_h[:colocation][:resources] = params.to_unsafe_h[:colocation][:resources].values
+      params[:colocation][:resources] = params[:colocation][:resources].values
     end
   end
 
