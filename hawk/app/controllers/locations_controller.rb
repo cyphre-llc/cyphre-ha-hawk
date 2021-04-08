@@ -35,7 +35,7 @@ class LocationsController < ApplicationController
   end
 
   def create
-    normalize_params! params.to_unsafe_h[:location]
+    normalize_params! params[:location]
     @title = _('Create Location Constraint')
 
     @location = Location.new params.to_unsafe_h[:location]
@@ -80,10 +80,10 @@ class LocationsController < ApplicationController
   end
 
   def update
-    normalize_params! params.to_unsafe_h[:location]
+    normalize_params! params[:location]
     @title = _('Edit Location Constraint')
 
-    if params.to_unsafe_h[:revert]
+    if params[:revert]
       return redirect_to edit_cib_location_url(cib_id: @cib.id, id: @location.id)
     end
 
@@ -156,7 +156,7 @@ class LocationsController < ApplicationController
   end
 
   def set_record
-    @location = Location.find params.to_unsafe_h[:id]
+    @location = Location.find params[:id]
 
     unless @location
       respond_to do |format|
